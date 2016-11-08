@@ -121,7 +121,7 @@ def main():
         print colored (('%s, %s' % (c[0], c[1])), 'yellow')
     print colored("-------------------------------------------------------------\n", 'magenta')
     response = int()
-    while response not in contexts[0]:
+    while not any(response in item for item in contexts):
         response = raw_input('Select context: ')
     print colored("-------------------------------------------------------------\n", 'magenta')
     print colored("Available projects:", "cyan")
@@ -129,7 +129,7 @@ def main():
         print colored (('%s, %s' % (p[0], p[1])), 'yellow')
     print colored("-------------------------------------------------------------\n", 'magenta')
     response = int()
-    while not response in projects[0]:
+    while not any(response in item for item in projects):
         response = raw_input('Select porject: ')
 
     writeel(description=description, context=1, project=3, **params)
