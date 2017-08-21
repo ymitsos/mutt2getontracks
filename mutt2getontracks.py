@@ -31,13 +31,13 @@ def findel(element, **kwargs):
         sys.exit(1)
 
 def writeel(description, project, context, **kwargs):
-    payload = str("""
+    payload = unicode("""
             <todo>
                     <description>%s</description>
                     <context_id>%i</context_id>
                     <project_id>%i</project_id>
             </todo>"""
-                  % (description, context, project))
+               % (description, context, project)).encode("utf-8")
 
     headers = {"Content-Type":"application/xml"}
     r = requests.post('https://%s/todos.xml' % (kwargs['server']),
@@ -107,7 +107,8 @@ def main():
         input_stream = sys.stdin.read()
         if input_stream:
             headers = Parser().parsestr(input_stream)
-            description = decode_header(headers['Subject'])[0][0]
+            description = decode_header(headers['Subject'])[0][0].decode(decode_header(headers['Subject'])[0][1])
+
     else:
         sys.stderr.write("No data available from stdin.\n")
         sys.exit(1)
