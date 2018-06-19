@@ -107,11 +107,9 @@ def main():
         input_stream = sys.stdin.read()
         if input_stream:
             headers = Parser().parsestr(input_stream)
-            if decode_header(headers['Subject'])[0][1] is None:
-                description = decode_header(headers['Subject'])[0][0]
-            else:
-                description = decode_header(headers['Subject'])[0][0].decode(decode_header(headers['Subject'])[0][1])
-
+            default_charset = 'ASCII'
+            description = ' '.join([ unicode(t[0], t[1] or default_charset) 
+                                    for t in decode_header(headers['Subject'])])
     else:
         sys.stderr.write("No data available from stdin.\n")
         sys.exit(1)
