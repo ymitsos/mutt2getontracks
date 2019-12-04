@@ -24,10 +24,10 @@ def findel(element, **kwargs):
 
     if r.status_code == 200:
         tree = ET.fromstring(r.text)
-        return map(lambda item: (item[0].text, item[1].text), tree)
+        return list(map(lambda item: (item[0].text, item[1].text), tree))
     else:
-        print colored(("Couldn't get %s from server: %s\n"
-                       % (element, kwargs['server'])), 'red')
+        print(colored(("Couldn't get %s from server: %s\n"
+                       % (element, kwargs['server'])), 'red'))
         sys.exit(1)
 
 def writeel(description, project, context, **kwargs):
@@ -39,18 +39,20 @@ def writeel(description, project, context, **kwargs):
             </todo>"""
                   % (description, context, project))
 
+    p = payload.encode('utf-8')
+
     headers = {"Content-Type":"application/xml"}
     r = requests.post('https://%s/todos.xml' % (kwargs['server']),
                       auth=(kwargs['username'],kwargs['password']),
-                      verify=kwargs['verifyCert'], data =payload,
+                      verify=kwargs['verifyCert'], data=p,
                       headers=headers)
 
     if r.status_code == 201:
-        print colored(("Succesfully created task: %s\n"
-                       % r.headers['Location']), 'green')
+        print(colored(("Succesfully created task: %s\n"
+                       % r.headers['Location']), 'green'))
         return
     else:
-        print colored("Couldn't insert todo\n", 'red')
+        print(colored("Couldn't insert todo\n", 'red'))
         sys.exit(1)
 
 
@@ -107,7 +109,7 @@ def main():
         input_stream = sys.stdin.read()
         if input_stream:
             headers = Parser().parsestr(input_stream)
-            description = decode_header(headers['Subject'])[0][0]
+            description = decode_header(headers['Subject'])[0][0].decode('utf-8')
     else:
         sys.stderr.write("No data available from stdin.\n")
         sys.exit(1)
@@ -115,24 +117,23 @@ def main():
 
     contexts = findel('contexts', **params)
     projects = findel('projects', **params)
-    print colored("-------------------------------------------------------------\n", 'magenta')
-    print colored("Available contexts:", "cyan")
+    print(colored("-------------------------------------------------------------\n", 'magenta'))
+    print(colored("Available contexts:", "cyan"))
     for c in contexts:
-        print colored (('%s, %s' % (c[0], c[1])), 'yellow')
-    print colored("-------------------------------------------------------------\n", 'magenta')
-    response = int()
-    while response not in contexts[0]:
-        response = raw_input('Select context: ')
-    print colored("-------------------------------------------------------------\n", 'magenta')
-    print colored("Available projects:", "cyan")
+        print(colored (('%s, %s' % (c[0], c[1])), 'yellow'))
+    print(colored("-------------------------------------------------------------\n", 'magenta'))
+    context = int()
+    while context not in [item[0] for item in contexts]:
+        context = input('Select context: ')
+    print(colored("-------------------------------------------------------------\n", 'magenta'))
+    print(colored("Available projects:", "cyan"))
     for p in projects:
-        print colored (('%s, %s' % (p[0], p[1])), 'yellow')
-    print colored("-------------------------------------------------------------\n", 'magenta')
-    response = int()
-    while not response in projects[0]:
-        response = raw_input('Select porject: ')
-
-    writeel(description=description, context=1, project=3, **params)
+        print(colored (('%s, %s' % (p[0], p[1])), 'yellow'))
+    print(colored("-------------------------------------------------------------\n", 'magenta'))
+    project = int()
+    while project not in [item[0] for item in projects]:
+        project = input('Select project: ')
+    writeel(description, int(context), int(project), **params)
     sys.exit(0)
 
 if __name__ == '__main__':
