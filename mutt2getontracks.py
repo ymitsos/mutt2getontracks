@@ -31,13 +31,13 @@ def findel(element, **kwargs):
         sys.exit(1)
 
 def writeel(description, project, context, **kwargs):
-    payload = unicode("""
+    payload = str("""
             <todo>
                     <description>%s</description>
                     <context_id>%i</context_id>
                     <project_id>%i</project_id>
             </todo>"""
-               % (description, context, project)).encode("utf-8")
+               % (description, context, project))
 
     p = payload.encode('utf-8')
 
@@ -110,8 +110,6 @@ def main():
         if input_stream:
             headers = Parser().parsestr(input_stream)
             description = decode_header(headers['Subject'])[0][0].decode('utf-8')
-            description = ' '.join([ unicode(t[0], t[1] or default_charset) 
-                                    for t in decode_header(headers['Subject'])])
     else:
         sys.stderr.write("No data available from stdin.\n")
         sys.exit(1)
